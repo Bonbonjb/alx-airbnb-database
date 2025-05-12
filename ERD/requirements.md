@@ -69,5 +69,5 @@ This document outlines the entity-relationship (ER) design for the Airbnb clone 
 
 ## ER Diagram
 See the corresponding ERD image:  
-📍 `ERD/airbnb-erd-diagram.png`
+📍 `ERD-Diagram.drawio.png`
 
