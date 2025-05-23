@@ -1,23 +1,25 @@
-CREATE PARTITION FUNCTION pf_booking_by_month (DATE)
-AS RANGE LEFT FOR VALUES (
-    '2024-01-31', 
-    '2024-02-29', 
-    '2024-03-31'
-);
+-- Step 1: Drop table if it exists
+DROP TABLE IF EXISTS booking CASCADE;
 
--- Create partition scheme
--- This assigns each range to a filegroup (use PRIMARY if unsure)
-CREATE PARTITION SCHEME ps_booking_by_month
-AS PARTITION pf_booking_by_month
-ALL TO ([PRIMARY]);  -- or map to custom filegroups if available
-
-CREATE TABLE bookings (
-    id INT IDENTITY(1,1) PRIMARY KEY,
+-- Step 2: Create partitioned table
+CREATE TABLE booking (
+    id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
     property_id INT NOT NULL,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
     status VARCHAR(50),
-    created_at DATETIME DEFAULT GETDATE()
-)
-ON ps_booking_by_month (start_date);  -- partitioning column
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) PARTITION BY RANGE (start_date);
+
+-- Step 3: Create monthly partitions (example for Jan to Mar 2024)
+CREATE TABLE booking_2024_01 PARTITION OF booking
+    FOR VALUES FROM ('2024-01-01') TO ('2024-02-01');
+
+CREATE TABLE booking_2024_02 PARTITION OF booking
+    FOR VALUES FROM ('2024-02-01') TO ('2024-03-01');
+
+CREATE TABLE booking_2024_03 PARTITION OF booking
+    FOR VALUES FROM ('2024-03-01') TO ('2024-04-01');
+
+
